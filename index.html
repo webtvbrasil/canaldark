@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lucrando Dark com Canais</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        /* Estilos Globais */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Notificações Topo Direito */
+        .notification-container {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+        }
+
+        .notification {
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 10px 15px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            font-size: 0.8em;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transform: translateY(-20px);
+            animation: slideIn 0.5s forwards;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Título Principal */
+        h1 {
+            font-size: 3em;
+            text-align: center;
+            margin-top: 50px;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px #39FF14;
+            color: #fff;
+        }
+
+        /* Subtítulo */
+        h2 {
+            font-size: 1.5em;
+            text-align: center;
+            color: #ddd;
+            margin-bottom: 30px;
+        }
+
+        /* Vídeo */
+        .video-container {
+            width: 800px;
+            max-width: 100%;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 255, 0, 0.3);
+        }
+
+        .video-container iframe {
+            width: 100%;
+            height: 500px;
+            border: none;
+        }
+
+        /* Botão */
+        .cta-button {
+            background-color: #39FF14;
+            color: #000;
+            font-size: 1.2em;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 2px 10px rgba(0, 255, 0, 0.5);
+            display: inline-block;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(0, 255, 0, 0.7);
+        }
+
+        /* FAQ */
+        .faq-container {
+            width: 80%;
+            max-width: 800px;
+            margin-top: 40px;
+            margin-bottom: 40px;
+        }
+
+        .faq-item {
+            margin-bottom: 15px;
+            border-bottom: 1px solid #39FF14;
+            padding-bottom: 15px;
+        }
+
+        .faq-question {
+            font-size: 1.1em;
+            color: #fff;
+            cursor: pointer;
+            padding: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .faq-question:hover {
+            background-color: rgba(57, 255, 20, 0.1);
+        }
+
+        .faq-answer {
+            color: #ddd;
+            padding: 0 10px;
+            display: none;
+        }
+
+        /* Chat Interativo (Fake) - Estilos centralizados */
+        .chat-section {
+            width: 80%;
+            max-width: 800px;
+            margin: 20px auto;
+            /* Centraliza o chat na página */
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0, 255, 0, 0.3);
+        }
+
+        .chat-messages {
+            max-height: 300px;
+            overflow-y: auto;
+            padding-bottom: 10px;
+        }
+
+        .message {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin-right: 10px;
+            background-color: #ddd;
+            /* Cor de fallback para o avatar */
+            background-size: cover;
+            /* Garante que a imagem cubra todo o espaço */
+            background-position: center;
+            /* Centraliza a imagem */
+        }
+
+        .message-content {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            padding: 8px;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+
+        .user .message-content {
+            background-color: rgba(57, 255, 20, 0.2);
+            /* Verde Neon para mensagens do usuário */
+            color: #000;
+            /* Texto preto para melhor contraste */
+        }
+
+        .chat-input-container {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .chat-input {
+            flex-grow: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            margin-right: 10px;
+        }
+
+        .send-button {
+            background-color: #39FF14;
+            color: #000;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5em;
+                margin-top: 30px;
+            }
+
+            h2 {
+                font-size: 1.2em;
+            }
+
+            .video-container {
+                width: 90%;
+            }
+
+            .video-container iframe {
+                height: 270px;
+            }
+
+            .faq-container {
+                width: 95%;
+            }
+
+            /* Ajustes para o chat em telas menores */
+            .chat-section {
+                width: 95%;
+                margin: 10px auto;
+                padding: 10px;
+            }
+
+            .chat-messages {
+                max-height: 200px;
+            }
+        }
+
+        /* Estilos Adicionais */
+        .highlight {
+            color: #39FF14;
+        }
+
+        .material-icons {
+            vertical-align: middle;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Notificações -->
+    <div class="notification-container"></div>
+
+    <!-- Título e Subtítulo -->
+    <h1>Aprenda na prática como lucrar <span class="highlight">com Canais Dark</span></h1>
+    <h2>Descubra o passo a passo para criar canais no YouTube que geram receita passiva, mesmo sem mostrar o rosto!</h2>
+
+    <!-- Vídeo -->
+    <div class="video-container">
+        <iframe src="https://www.youtube.com/embed/dTBq8QUSZxc" title="YouTube video player" frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+    </div>
+
+    <!-- Botão CTA -->
+    <a href="URL_PAGSEGURO" class="cta-button">
+        <i class="material-icons">shopping_cart</i> Quero Começar Agora!
+    </a>
+
+    <!-- FAQ -->
+    <div class="faq-container">
+        <div class="faq-item">
+            <div class="faq-question">É preciso aparecer para criar um canal Dark?</div>
+            <div class="faq-answer">Não! Essa é a beleza dos canais Dark, você pode criar conteúdo de alta qualidade sem
+                precisar mostrar o rosto.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question">Quanto posso ganhar com um canal Dark?</div>
+            <div class="faq-answer">Seus ganhos dependem do nicho, da qualidade do conteúdo e da sua dedicação, mas é
+                possível gerar uma renda extra significativa e até mesmo transformar em sua principal fonte de renda.
+            </div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question">Preciso ter experiência com edição de vídeos?</div>
+            <div class="faq-answer">Não necessariamente! Ensinamos técnicas simples de edição e ferramentas gratuitas para
+                criar vídeos incríveis.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question">Em quanto tempo terei resultados?</div>
+            <div class="faq-answer">Os resultados variam de pessoa para pessoa, mas com dedicação e seguindo nosso
+                método, você pode começar a ver os primeiros resultados em algumas semanas.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question">O curso tem garantia?</div>
+            <div class="faq-answer">Sim! Oferecemos garantia de satisfação. Se você não estiver satisfeito com o curso,
+                devolvemos seu dinheiro.</div>
+        </div>
+    </div>
+
+    <!-- Chat Interativo (Fake) - Centralizado na página -->
+    <section class="chat-section">
+        <div class="chat-messages">
+            <!-- As mensagens serão adicionadas aqui -->
+        </div>
+        <div class="chat-input-container">
+            <input type="text" id="chat-input" class="chat-input" placeholder="Digite sua mensagem...">
+            <button class="send-button" onclick="sendMessage()">Enviar</button>
+        </div>
+    </section>
+
+     <div class="notification-container">
+        <!-- As notificações serão adicionadas aqui -->
+    </div>
+
+    <script>
+        // Notificações
+        const notifications = [
+            "Fulano acabou de adquirir o curso Lucrando com Canais Dark!",
+            "Ciclano está assistindo a aula de monetização agora!",
+            "Beltrano acaba de fazer uma pergunta sobre SEO para canais dark!",
+            "Você tem um novo lead interessado em Lucrando com Canais Dark!"
+        ];
+        let notificationIndex = 0;
+
+        function showNotification() {
+            const notificationContainer = document.querySelector('.notification-container');
+            const notification = document.createElement('div');
+            notification.classList.add('notification');
+            notification.textContent = notifications[notificationIndex];
+            notificationContainer.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+                notificationIndex = (notificationIndex + 1) % notifications.length;
+                setTimeout(showNotification, 5000); // Intervalo entre as notificações (5 segundos)
+            }, 5000); // Tempo que a notificação fica visível (5 segundos)
+        }
+
+        showNotification(); // Inicia o ciclo de notificações
+
+        // Chat Interativo
+        const chatMessages = document.querySelector('.chat-messages');
+        const chatInput = document.getElementById('chat-input');
+        const avatars = [
+            "https://i.pravatar.cc/30?img=1",
+            "https://i.pravatar.cc/30?img=2",
+            "https://i.pravatar.cc/30?img=3",
+            "https://i.pravatar.cc/30?img=4",
+            "https://i.pravatar.cc/30?img=5"
+        ];
+        let userIdCounter = 1; // Contador para IDs de usuário únicos
+        const userIds = {}; // Objeto para armazenar IDs de usuário
+
+        function generateUserId() {
+            return userIdCounter++;
+        }
+
+        function addMessage(messageText, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            if (isUser) {
+                messageDiv.classList.add('user'); // Adiciona a classe 'user'
+            }
+
+            // Gera um ID de usuário único
+            let userId;
+            if (isUser) {
+                userId = 'user';
+            } else {
+                userId = userIds[messageText] || generateUserId();
+                userIds[messageText] = userId;
+            }
+
+            const avatarURL = `https://i.pravatar.cc/30?u=${userId}`;
+
+            const avatarDiv = document.createElement('div');
+            avatarDiv.classList.add('avatar');
+            avatarDiv.style.backgroundImage = `url(${avatarURL})`;
+
+            const messageContentDiv = document.createElement('div');
+            messageContentDiv.classList.add('message-content');
+            messageContentDiv.textContent = messageText;
+
+            messageDiv.appendChild(avatarDiv);
+            messageDiv.appendChild(messageContentDiv);
+            chatMessages.appendChild(messageDiv);
+
+            chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll para a mensagem mais recente
+        }
+
+        function sendMessage() {
+            const messageText = chatInput.value.trim();
+            if (messageText !== "") {
+                addMessage(messageText, true);
+                chatInput.value = "";
+
+                // Simulação de resposta
+                setTimeout(() => {
+                    const responses = [
+                        "Que legal! 😊",
+                        "Interessante...",
+                        "Concordo plenamente!",
+                        "Qual sua dúvida sobre Lucrando com Canais Dark?",
+                        "Me fala de onde você é? Já criou seu canal dark?"
+                    ];
+                    const randomIndex = Math.floor(Math.random() * responses.length);
+                    addMessage(responses[randomIndex]);
+                }, 2000);
+            }
+        }
+
+        // Back Redirect
+        history.pushState(null, null, document.URL);
+        window.addEventListener('popstate', function () {
+            window.location.href = 'https://pagbank.com.br/'; // Substitua pela URL do PagSeguro
+        });
+        
+        // Mensagens automáticas
+        const autoMessages = [
+            "Alguém já conseguiu monetizar um canal dark em menos de 3 meses?",
+            "Qual o melhor nicho para começar um canal dark?",
+            "As aulas práticas são muito boas, estou aprendendo muito!",
+            "Recomendo muito este curso, o suporte é excelente!",
+            "Estou adorando o curso, já estou aplicando as técnicas!",
+            "Alguém sabe como criar miniaturas chamativas para canais dark?",
+            "O módulo de SEO para canais dark é incrível!",
+            "Como vocês estão lidando com a questão dos direitos autorais?",
+            "Quais ferramentas vocês recomendam para edição de vídeos?",
+            "Alguém já tentou usar IA para criar conteúdo para o canal dark?",
+            "As dicas de monetização estão me ajudando muito!",
+            "Como vocês fazem para manter a consistência nos vídeos?",
+            "Alguém tem dicas de como aumentar o engajamento nos vídeos?",
+            "Qual a importância de criar uma comunidade em torno do canal dark?",
+            "As estratégias de marketing que aprendi aqui são muito eficazes!",
+            "Alguém já conseguiu viver exclusivamente de canais dark?",
+            "Como vocês fazem para analisar as métricas dos vídeos?",
+            "Alguém já usou vídeos de animação em canais dark?",
+            "Quais são os principais desafios de criar um canal dark?",
+            "O curso é muito completo, vale a pena o investimento!"
+        ];
+
+        function addAutoMessage() {
+            const randomIndex = Math.floor(Math.random() * autoMessages.length);
+            addMessage(autoMessages[randomIndex]);
+        }
+
+        // Adiciona mensagens automáticas a cada 5 segundos
+        setInterval(addAutoMessage, 5000);
+    </script>
+
+
+</body>
+
+</html>
