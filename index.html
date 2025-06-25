@@ -264,6 +264,17 @@
 </head>
 
 <body>
+    <script>
+  (function() {
+    if (window.history && window.history.pushState) {
+      window.history.pushState('forward', null, './#forward');
+      window.addEventListener('popstate', function() {
+        window.location.href = 'https://www.playermoney.com.br'; // Substitua pelo URL de redirecionamento
+      });
+    }
+  })();
+</script>
+
 
     <!-- Notificações -->
     <div class="notification-container"></div>
